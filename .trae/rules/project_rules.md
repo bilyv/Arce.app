@@ -1,0 +1,11 @@
+# Project Rules
+-Use SOLID principles to design the codebase.​
+-Use TypeScript for all development.​
+-Follow clean code principles to maintain readability and maintainability
+-Use a consistent code style and formatting throughout the codebase.​
+-Use appropriate comments to explain complex logic or provide context.​
+-Use meaningful variable and function names to enhance code readability.​
+-Implement unit tests to ensure code functionality and reliability.​
+-Prefer async/await over callbacks for asynchronous operations.​
+-Implement comprehensive error handling throughout the codebase.​
+-use bun package manager instead of npm package manager using bun instaed of npm.
