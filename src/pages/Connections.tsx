@@ -6,9 +6,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Search, UserPlus, Users, Plus, MessageSquare, Star, Settings, Mail, Compass } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Search, UserPlus, Users, Star, Mail, Compass, MessageSquare, Settings, Plus } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 
@@ -43,78 +42,35 @@ const Connections = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [discoverSearchQuery, setDiscoverSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("people");
-  const [showCreateTeamDialog, setShowCreateTeamDialog] = useState(false);
   const [showDiscoverDialog, setShowDiscoverDialog] = useState(false);
   const [showMessageDialog, setShowMessageDialog] = useState(false);
   const [activeContactId, setActiveContactId] = useState<number | null>(null);
   const [messageText, setMessageText] = useState("");
-  const [newTeamName, setNewTeamName] = useState("");
-  const [newTeamEmoji, setNewTeamEmoji] = useState("🚀");
-  const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
   const [favorites, setFavorites] = useState<number[]>(
     mockConnections.filter(c => c.isFavorite).map(c => c.id)
   );
 
-  // Get active contact details 
+  // Get active contact details
   const activeContact = mockConnections.find(c => c.id === activeContactId);
 
   // Filter connections based on search query and show only connected users
-  const filteredConnections = mockConnections.filter(connection => 
+  const filteredConnections = mockConnections.filter(connection =>
     connection.isConnected &&
     (connection.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     connection.username.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   // Filter suggested connections based on discover search query
-  const filteredSuggestedConnections = mockSuggestedConnections.filter(connection => 
+  const filteredSuggestedConnections = mockSuggestedConnections.filter(connection =>
     connection.name.toLowerCase().includes(discoverSearchQuery.toLowerCase()) ||
     connection.username.toLowerCase().includes(discoverSearchQuery.toLowerCase()) ||
     connection.role.toLowerCase().includes(discoverSearchQuery.toLowerCase())
   );
 
   // Filter teams based on search query
-  const filteredTeams = mockTeams.filter(team => 
+  const filteredTeams = mockTeams.filter(team =>
     team.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  const handleCreateTeam = () => {
-    if (!newTeamName.trim()) {
-      toast({
-        title: "Team name required",
-        description: "Please enter a name for your team",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (selectedMembers.length === 0) {
-      toast({
-        title: "Team members required",
-        description: "Please select at least one team member",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Mock team creation
-    toast({
-      title: "Team created",
-      description: `${newTeamName} has been created with ${selectedMembers.length} members!`,
-    });
-
-    // Reset form and close dialog
-    setNewTeamName("");
-    setSelectedMembers([]);
-    setShowCreateTeamDialog(false);
-  };
-
-  const toggleMemberSelection = (connectionId: number) => {
-    if (selectedMembers.includes(connectionId)) {
-      setSelectedMembers(selectedMembers.filter(id => id !== connectionId));
-    } else {
-      setSelectedMembers([...selectedMembers, connectionId]);
-    }
-  };
 
   const handleConnect = (connectionId: number) => {
     toast({
@@ -164,8 +120,6 @@ const Connections = () => {
     }
   };
 
-  const emojis = ["🚀", "💎", "🔥", "⚡", "🌟", "🎯", "🎨", "📊", "💡", "🛠️"];
-
   return (
     <Layout>
       {/* Message Dialog */}
@@ -185,18 +139,18 @@ const Connections = () => {
               </div>
             )}
           </DialogHeader>
-          
+
           <div className="bg-accent/30 rounded-md p-3 my-4 h-[150px] overflow-y-auto">
             <p className="text-sm text-muted-foreground text-center italic">
               Your conversation history will appear here
             </p>
           </div>
-          
+
           <div className="relative mt-2">
             <div className="flex items-center border border-input rounded-md focus-within:ring-1 focus-within:ring-primary">
-              <Input 
-                className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0" 
-                placeholder="Type your message..." 
+              <Input
+                className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                placeholder="Type your message..."
                 value={messageText}
                 onChange={(e) => setMessageText(e.target.value)}
                 onKeyDown={(e) => {
@@ -206,10 +160,10 @@ const Connections = () => {
                   }
                 }}
               />
-              <Button 
-                type="button" 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
                 className="h-8 px-3 mr-1"
                 onClick={handleSendMessage}
               >
@@ -238,15 +192,15 @@ const Connections = () => {
             <div className="relative w-[260px]">
               <div className="flex w-full items-center rounded-md border border-input bg-background px-3 focus-within:ring-1 focus-within:ring-primary">
                 <Search className="h-4 w-4 text-muted-foreground" />
-                <Input 
-                  className="flex w-full border-0 bg-transparent p-2 text-sm shadow-none focus-visible:outline-none focus-visible:ring-0" 
-                  placeholder="Search connections..." 
+                <Input
+                  className="flex w-full border-0 bg-transparent p-2 text-sm shadow-none focus-visible:outline-none focus-visible:ring-0"
+                  placeholder="Search connections..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
             </div>
-            
+
             <TabsContent value="people" className="space-y-3 w-full mt-0">
               <div className="flex justify-end m-0">
                 <Dialog open={showDiscoverDialog} onOpenChange={setShowDiscoverDialog}>
@@ -265,15 +219,15 @@ const Connections = () => {
                     <div className="relative my-4">
                       <div className="flex w-full items-center rounded-md border border-input bg-background px-3 focus-within:ring-1 focus-within:ring-primary">
                         <Search className="h-4 w-4 text-muted-foreground" />
-                        <Input 
-                          className="flex w-full border-0 bg-transparent p-2 text-sm shadow-none focus-visible:outline-none focus-visible:ring-0" 
-                          placeholder="Search profiles..." 
+                        <Input
+                          className="flex w-full border-0 bg-transparent p-2 text-sm shadow-none focus-visible:outline-none focus-visible:ring-0"
+                          placeholder="Search profiles..."
                           value={discoverSearchQuery}
                           onChange={(e) => setDiscoverSearchQuery(e.target.value)}
                         />
                       </div>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 gap-3 mt-2">
                       {filteredSuggestedConnections.length > 0 ? (
                         filteredSuggestedConnections.map(connection => (
@@ -291,9 +245,9 @@ const Connections = () => {
                                     <p className="text-xs text-muted-foreground">{connection.role}</p>
                                   </div>
                                 </div>
-                                
-                                <Button 
-                                  size="sm" 
+
+                                <Button
+                                  size="sm"
                                   variant="outline"
                                   className="text-xs h-8"
                                   onClick={() => {
@@ -320,115 +274,12 @@ const Connections = () => {
                 </Dialog>
               </div>
             </TabsContent>
-            
+
             <TabsContent value="teams" className="space-y-3 w-full mt-0">
               <div className="flex justify-end m-0">
-                <Dialog open={showCreateTeamDialog} onOpenChange={(open) => {
-                  setShowCreateTeamDialog(open);
-                  if (!open) {
-                    setSelectedMembers([]);
-                  }
-                }}>
-                  <DialogTrigger asChild>
-                    <Button className="arc-gradient hover:opacity-90">
-                      <Plus className="h-4 w-4 mr-1" /> Create Team
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[500px] max-h-[85vh] overflow-y-auto">
-                    <DialogHeader>
-                      <DialogTitle>Create a new team</DialogTitle>
-                      <DialogDescription>
-                        Create a team to collaborate with your connections.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                      <div className="grid gap-2">
-                        <Label htmlFor="team-name">Team name</Label>
-                        <Input 
-                          id="team-name" 
-                          placeholder="Enter team name" 
-                          value={newTeamName}
-                          onChange={(e) => setNewTeamName(e.target.value)}
-                        />
-                      </div>
-                      <div className="grid gap-2">
-                        <Label>Team icon</Label>
-                        <div className="flex flex-wrap gap-2">
-                          {emojis.map((emoji) => (
-                            <button
-                              key={emoji}
-                              type="button"
-                              className={`w-8 h-8 flex items-center justify-center rounded-md text-lg ${
-                                newTeamEmoji === emoji 
-                                  ? "bg-primary/20 ring-2 ring-primary" 
-                                  : "hover:bg-accent"
-                              }`}
-                              onClick={() => setNewTeamEmoji(emoji)}
-                            >
-                              {emoji}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                      
-                      <div className="grid gap-2 mt-2">
-                        <Label>Select team members</Label>
-                        <div className="border rounded-md p-2 max-h-[200px] overflow-y-auto">
-                          {mockConnections.filter(c => c.isConnected).length > 0 ? (
-                            mockConnections.filter(c => c.isConnected).map(connection => (
-                              <div 
-                                key={connection.id} 
-                                className={`flex items-center justify-between p-2 rounded-md mb-1 cursor-pointer hover:bg-accent ${
-                                  selectedMembers.includes(connection.id) ? "bg-primary/10" : ""
-                                }`}
-                                onClick={() => toggleMemberSelection(connection.id)}
-                              >
-                                <div className="flex items-center gap-2">
-                                  <input 
-                                    type="checkbox" 
-                                    checked={selectedMembers.includes(connection.id)} 
-                                    onChange={() => {}} // Handled by the div onClick
-                                    className="h-4 w-4"
-                                  />
-                                  <Avatar className="h-8 w-8">
-                                    <AvatarImage src={connection.avatar} alt={connection.name} />
-                                    <AvatarFallback>{connection.name.substring(0, 2)}</AvatarFallback>
-                                  </Avatar>
-                                  <div>
-                                    <p className="text-sm font-medium">{connection.name}</p>
-                                    <p className="text-xs text-muted-foreground">@{connection.username}</p>
-                                  </div>
-                                </div>
-                                <div className={cn(
-                                  "w-2 h-2 rounded-full", 
-                                  connection.status === "online" ? "bg-green-500" : "bg-muted"
-                                )} />
-                              </div>
-                            ))
-                          ) : (
-                            <div className="text-center py-4 text-muted-foreground">
-                              No connections available
-                            </div>
-                          )}
-                        </div>
-                        <p className="text-xs text-muted-foreground">
-                          {selectedMembers.length} member{selectedMembers.length !== 1 ? 's' : ''} selected
-                        </p>
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <Button variant="outline" onClick={() => {
-                        setShowCreateTeamDialog(false);
-                        setSelectedMembers([]);
-                      }}>
-                        Cancel
-                      </Button>
-                      <Button onClick={handleCreateTeam}>
-                        Create Team
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
+                <Button className="arc-gradient hover:opacity-90" onClick={() => window.location.href = '/team'}>
+                  Create Team
+                </Button>
               </div>
             </TabsContent>
           </div>
@@ -451,9 +302,9 @@ const Connections = () => {
                           </div>
                         </div>
                         <div className={cn(
-                          "px-2 py-1 rounded-full text-xs font-medium", 
-                          connection.status === "online" 
-                            ? "bg-green-500/10 text-green-500" 
+                          "px-2 py-1 rounded-full text-xs font-medium",
+                          connection.status === "online"
+                            ? "bg-green-500/10 text-green-500"
                             : "bg-muted text-muted-foreground"
                         )}>
                           {connection.status}
@@ -469,19 +320,19 @@ const Connections = () => {
                       </div>
                     </CardContent>
                     <CardFooter className="flex gap-2 pt-0">
-                      <Button 
-                        size="sm" 
-                        variant="ghost" 
+                      <Button
+                        size="sm"
+                        variant="ghost"
                         className="h-8 w-8 p-0 rounded-full"
                         onClick={() => handleMessage(connection.id)}
                       >
                         <Mail className="h-4 w-4" />
                         <span className="sr-only">Message</span>
                       </Button>
-                      <Button 
-                        size="sm" 
-                        variant="ghost" 
-                        className={cn("h-8 w-8 p-0 rounded-full", 
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className={cn("h-8 w-8 p-0 rounded-full",
                           favorites.includes(connection.id) ? "text-yellow-500 hover:text-yellow-600" : ""
                         )}
                         onClick={() => handleToggleFavorite(connection.id)}
@@ -547,10 +398,11 @@ const Connections = () => {
                         <Settings className="h-4 w-4" />
                         <span className="sr-only">Settings</span>
                       </Button>
-                      <Button 
-                        size="sm" 
+                      <Button
+                        size="sm"
                         variant="outline"
                         className="text-xs h-8 px-3 ml-auto"
+                        onClick={() => window.location.href = '/team'}
                       >
                         View Details
                       </Button>
@@ -572,4 +424,4 @@ const Connections = () => {
   );
 };
 
-export default Connections; 
+export default Connections;

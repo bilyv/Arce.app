@@ -10,6 +10,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Create from "./pages/Create";
 import Connections from "./pages/Connections";
+import Team from "./pages/Team";
 import Schedule from "./pages/Schedule";
 import Profile from "./pages/Profile";
 import Auth from "./pages/Auth";
@@ -30,7 +31,7 @@ const App = () => (
               <Routes>
                 {/* Public route */}
                 <Route path="/auth" element={<Auth />} />
-                
+
                 {/* Protected routes */}
                 <Route path="/" element={
                   <ProtectedRoute>
@@ -62,7 +63,12 @@ const App = () => (
                     <LearnPurpose />
                   </ProtectedRoute>
                 } />
-                
+                <Route path="/team" element={
+                  <ProtectedRoute>
+                    <Team />
+                  </ProtectedRoute>
+                } />
+
                 {/* Catch-all route */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
