@@ -80,11 +80,11 @@ export function TodoItem({ todo, categoryColor }: TodoItemProps) {
   const handleSelectConnections = (connections: Connection[]) => {
     const connectionNames = connections.map(c => c.name).join(", ");
     const taskDetails = `Task: ${todo.title}${todo.dueDate ? ` - Due: ${format(new Date(todo.dueDate), "MMM d, yyyy")}` : ""}`;
-    
+
     navigator.clipboard.writeText(taskDetails);
     toast.success(`Task shared with ${connections.length} connection${connections.length !== 1 ? "s" : ""}`, {
-      description: connections.length <= 2 
-        ? `Shared with ${connectionNames}` 
+      description: connections.length <= 2
+        ? `Shared with ${connectionNames}`
         : `Shared with ${connections.length} people including ${connections[0].name}`,
       duration: 3000,
     });
@@ -116,11 +116,11 @@ export function TodoItem({ todo, categoryColor }: TodoItemProps) {
   const getPriorityLabel = (priority: Priority) => {
     return priority.charAt(0).toUpperCase() + priority.slice(1);
   };
-  
+
   const completedSubtasks = todo.subtasks.filter(st => st.completed).length;
   const hasSubtasks = todo.subtasks.length > 0;
-  const completionPercentage = hasSubtasks 
-    ? Math.round((completedSubtasks / todo.subtasks.length) * 100) 
+  const completionPercentage = hasSubtasks
+    ? Math.round((completedSubtasks / todo.subtasks.length) * 100)
     : todo.completed ? 100 : 0;
 
   // Check if todo has links
@@ -150,7 +150,7 @@ export function TodoItem({ todo, categoryColor }: TodoItemProps) {
           className="category-indicator"
           style={{ backgroundColor: categoryColor }}
         />
-        
+
         <div className="flex items-start gap-3">
           <div className="pt-0.5">
             <Checkbox
@@ -162,18 +162,62 @@ export function TodoItem({ todo, categoryColor }: TodoItemProps) {
               )}
             />
           </div>
-          
+
           <div className="flex-1 min-w-0">
             <div className="flex justify-between items-start">
-              <h3
-                className={cn(
-                  "font-medium text-lg mb-1 transition-all duration-300",
-                  todo.completed ? "line-through text-muted-foreground" : ""
+              <div className="flex items-center gap-2">
+                {/* Progress Circle - Moved to left side */}
+                {(hasSubtasks || todo.completed) && (
+                  <TooltipProvider>
+                    <Tooltip delayDuration={300}>
+                      <TooltipTrigger asChild>
+                        <div className="flex items-center">
+                          <ProgressCircle
+                            value={completionPercentage}
+                            size="sm"
+                            color={todo.completed ? categoryColor : undefined}
+                            className={cn(
+                              "transition-all duration-300 hover:scale-110 cursor-help",
+                              isHovered ? "opacity-100" : "opacity-80",
+                              todo.completed ? "opacity-100" : ""
+                            )}
+                            glowEffect={isHovered || completionPercentage > 75}
+                            animated={true}
+                            showPercentage={false}
+                            showFraction={true}
+                            completedCount={hasSubtasks ? completedSubtasks : (todo.completed ? 1 : 0)}
+                            totalCount={hasSubtasks ? todo.subtasks.length : 1}
+                          />
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="text-xs font-medium">
+                        {hasSubtasks ? (
+                          <>
+                            <div className="font-semibold">Task Progress</div>
+                            <div className="mt-1">{completedSubtasks} of {todo.subtasks.length} subtasks completed</div>
+                            <div className="mt-0.5">{completionPercentage}% complete</div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="font-semibold">Task Status</div>
+                            <div className="mt-1">{todo.completed ? "Completed" : "Pending"}</div>
+                          </>
+                        )}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 )}
-              >
-                {todo.title}
-              </h3>
-              
+
+                <h3
+                  className={cn(
+                    "font-medium text-lg mb-1 transition-all duration-300",
+                    todo.completed ? "line-through text-muted-foreground" : ""
+                  )}
+                >
+                  {todo.title}
+                </h3>
+              </div>
+
               <div className="flex gap-1">
                 {/* Links indicator */}
                 {hasLinks && (
@@ -200,43 +244,6 @@ export function TodoItem({ todo, categoryColor }: TodoItemProps) {
                   </TooltipProvider>
                 )}
 
-                {(hasSubtasks || todo.completed) && (
-                  <TooltipProvider>
-                    <Tooltip delayDuration={300}>
-                      <TooltipTrigger asChild>
-                        <div className="flex items-center">
-                          <ProgressCircle 
-                            value={completionPercentage} 
-                            size="sm" 
-                            color={todo.completed ? categoryColor : undefined}
-                            className={cn(
-                              "transition-all duration-300 mr-1 hover:scale-110 cursor-help",
-                              isHovered ? "opacity-100" : "opacity-80",
-                              todo.completed ? "opacity-100" : ""
-                            )}
-                            glowEffect={isHovered || completionPercentage > 75}
-                            animated={true}
-                          />
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent side="bottom" className="text-xs font-medium">
-                        {hasSubtasks ? (
-                          <>
-                            <div className="font-semibold">Task Progress</div>
-                            <div className="mt-1">{completedSubtasks} of {todo.subtasks.length} subtasks completed</div>
-                            <div className="mt-0.5">{completionPercentage}% complete</div>
-                          </>
-                        ) : (
-                          <>
-                            <div className="font-semibold">Task Status</div>
-                            <div className="mt-1">{todo.completed ? "Completed" : "Pending"}</div>
-                          </>
-                        )}
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                )}
-                
                 <div
                   className={cn(
                     "priority-dot",
@@ -245,7 +252,7 @@ export function TodoItem({ todo, categoryColor }: TodoItemProps) {
                   )}
                   data-tooltip={`Priority: ${getPriorityLabel(todo.priority)}`}
                 ></div>
-                
+
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
@@ -287,7 +294,7 @@ export function TodoItem({ todo, categoryColor }: TodoItemProps) {
                 </DropdownMenu>
               </div>
             </div>
-            
+
             {todo.description && (
               <p
                 className={cn(
@@ -298,12 +305,12 @@ export function TodoItem({ todo, categoryColor }: TodoItemProps) {
                 {todo.description}
               </p>
             )}
-            
+
             {hasSubtasks && (
               <Collapsible open={isOpen} onOpenChange={setIsOpen} className="my-2">
                 <div className="flex items-center justify-between">
                   <div className="text-xs text-muted-foreground">
-                    Subtasks: {completedSubtasks}/{todo.subtasks.length}
+                    Subtasks: {todo.subtasks.length}
                   </div>
                   <CollapsibleTrigger asChild>
                     <Button variant="ghost" size="sm" className="p-0 h-5 w-5">
@@ -316,7 +323,7 @@ export function TodoItem({ todo, categoryColor }: TodoItemProps) {
                 </CollapsibleContent>
               </Collapsible>
             )}
-            
+
             <div className="flex flex-wrap items-center gap-3 mt-2 text-xs text-muted-foreground">
               {todo.dueDate && (
                 <div className="flex items-center gap-1">
@@ -326,9 +333,9 @@ export function TodoItem({ todo, categoryColor }: TodoItemProps) {
                   </span>
                 </div>
               )}
-              
+
               {hasLinks && (
-                <div 
+                <div
                   className="flex items-center gap-1 text-primary hover:text-primary/80 cursor-pointer"
                   onClick={() => setShowLinksDialog(true)}
                 >
@@ -336,7 +343,7 @@ export function TodoItem({ todo, categoryColor }: TodoItemProps) {
                   <span>{todo.links?.length} link{todo.links?.length !== 1 ? 's' : ''}</span>
                 </div>
               )}
-              
+
               {todo.priority === "high" && !todo.completed && (
                 <div className="flex items-center gap-1 text-arc-red animate-pulse">
                   <AlertCircle className="h-3 w-3" />
@@ -347,7 +354,7 @@ export function TodoItem({ todo, categoryColor }: TodoItemProps) {
           </div>
         </div>
       </div>
-      
+
       {/* Share Popup */}
       {showSharePopup && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -355,19 +362,19 @@ export function TodoItem({ todo, categoryColor }: TodoItemProps) {
           <div className="relative bg-card rounded-xl shadow-lg w-72 py-4 animate-scale-in-out">
             <div className="px-4 pb-2 flex justify-between items-center border-b">
               <h3 className="font-semibold text-base">Share Task</h3>
-              <Button 
-                variant="ghost" 
-                size="icon" 
+              <Button
+                variant="ghost"
+                size="icon"
                 className="h-7 w-7"
                 onClick={handleCloseSharePopup}
               >
                 <X className="h-4 w-4" />
               </Button>
             </div>
-            
+
             {!showConnectionsSelector ? (
               <div className="p-4 space-y-3">
-                <Button 
+                <Button
                   variant="outline"
                   className="w-full justify-start gap-2"
                   onClick={handleShareWithConnections}
@@ -375,7 +382,7 @@ export function TodoItem({ todo, categoryColor }: TodoItemProps) {
                   <UserPlus className="h-4 w-4 text-arc-blue" />
                   <span>Share with connections</span>
                 </Button>
-                <Button 
+                <Button
                   variant="outline"
                   className="w-full justify-start gap-2"
                   onClick={handleShareWithTeam}
@@ -386,7 +393,7 @@ export function TodoItem({ todo, categoryColor }: TodoItemProps) {
               </div>
             ) : (
               <div className="p-4">
-                <ConnectionsSelector 
+                <ConnectionsSelector
                   onSelectConnections={handleSelectConnections}
                   onClose={() => setShowConnectionsSelector(false)}
                   todo={todo}
@@ -396,7 +403,7 @@ export function TodoItem({ todo, categoryColor }: TodoItemProps) {
           </div>
         </div>
       )}
-      
+
       {/* Links Dialog */}
       <Dialog open={showLinksDialog} onOpenChange={setShowLinksDialog}>
         <DialogContent className="max-w-md">
@@ -409,7 +416,7 @@ export function TodoItem({ todo, categoryColor }: TodoItemProps) {
               <p className="text-sm text-muted-foreground">Resources related to this task</p>
             </div>
           </div>
-          
+
           <div className="grid gap-3">
             {todo.links?.map((link) => (
               <a

@@ -10,6 +10,9 @@ interface ProgressCircleProps {
   color?: string;
   animated?: boolean;
   glowEffect?: boolean;
+  completedCount?: number;
+  totalCount?: number;
+  showFraction?: boolean;
 }
 
 export function ProgressCircle({
@@ -17,30 +20,33 @@ export function ProgressCircle({
   size = "md",
   showPercentage = true,
   className,
-  strokeWidth = 3,
+  strokeWidth = 4,
   color,
   animated = true,
   glowEffect = true,
+  completedCount,
+  totalCount,
+  showFraction = false,
 }: ProgressCircleProps) {
   // Ensure value is between 0 and 100
   const percentage = Math.min(100, Math.max(0, value));
-  
+
   // Calculate the circle properties
   const radius = 50 - strokeWidth * 2;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (percentage / 100) * circumference;
-  
+
   // Determine size class
   const sizeClasses = {
-    sm: "w-8 h-8 text-xs",
-    md: "w-12 h-12 text-sm",
-    lg: "w-16 h-16 text-base",
+    sm: "w-10 h-10 text-xs",
+    md: "w-14 h-14 text-sm",
+    lg: "w-20 h-20 text-base",
   };
 
   // Generate gradient ID
   const gradientId = React.useId();
   const filterId = React.useId();
-  
+
   return (
     <div
       className={cn(
@@ -66,7 +72,7 @@ export function ProgressCircle({
             </filter>
           </defs>
         )}
-        
+
         {/* Define gradient */}
         {!color && (
           <defs>
@@ -76,7 +82,7 @@ export function ProgressCircle({
             </linearGradient>
           </defs>
         )}
-        
+
         {/* Background circle with subtle pattern */}
         <circle
           className="text-gray-200 dark:text-gray-800"
@@ -88,7 +94,7 @@ export function ProgressCircle({
           strokeDasharray="4 2"
           opacity="0.3"
         />
-        
+
         {/* Background solid circle */}
         <circle
           className="text-gray-200 dark:text-gray-700"
@@ -98,7 +104,7 @@ export function ProgressCircle({
           fill="none"
           strokeWidth={strokeWidth}
         />
-        
+
         {/* Progress circle */}
         <circle
           className={color ? "" : ""}
@@ -117,18 +123,21 @@ export function ProgressCircle({
           }}
         />
       </svg>
-      
-      {showPercentage && (
+
+      {(showPercentage || showFraction) && (
         <div className="absolute inset-0 flex items-center justify-center font-medium transition-all">
           <span className={cn(
             "transition-all duration-300",
             percentage > 70 ? "text-primary dark:text-primary" : "",
-            percentage === 100 ? "scale-110" : ""
+            percentage === 100 ? "scale-110" : "",
+            size === "sm" && showFraction ? "text-[0.75rem]" : ""
           )}>
-            {Math.round(percentage)}
+            {showFraction && completedCount !== undefined && totalCount !== undefined
+              ? `${completedCount}/${totalCount}`
+              : Math.round(percentage)}
           </span>
         </div>
       )}
     </div>
   );
-} 
+}
